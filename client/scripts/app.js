@@ -1,7 +1,8 @@
 // YOUR CODE HERE:
 var app = {};
 app.init = function(){
-
+  this.handleUsernameClick();
+  this.handleSubmit();
 };
 
 app.server = "http://parse.sfm6.hackreactor.com/chatterbox/classes/messages";
@@ -46,10 +47,10 @@ app.clearMessages = function() {
 };
 
 app.renderMessage = function(message) {
-  var user = $("<h1 class='user'></h1>")
-  var text = $("<p class='text'></p>")
-  var roomname = $("<p class='user'></p>")
-  var messageDiv = $("<div class='message'></div>")
+  var user = $("<h1 class='user'></h1>");
+  var text = $("<p class='text'></p>");
+  var roomname = $("<p class='user'></p>");
+  var messageDiv = $("<div class='message'></div>");
   messageDiv.append(user, text, roomname);
   $('#chats').append(messageDiv);
   //$('.user').textContent = message.username;
@@ -62,5 +63,13 @@ app.renderMessage = function(message) {
 
 app.renderRoom = function(roomName) {
 
-  $('#roomSelect').append(`<div class='lobbyName'>${roomName}</div>`)
+  $('#roomSelect').append(`<div class='lobbyName'>${roomName}</div>`);
+};
+
+app.handleUsernameClick = function() {
+
+};
+
+app.handleSubmit = function() {
+
 };
