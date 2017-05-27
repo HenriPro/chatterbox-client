@@ -5,8 +5,10 @@ app.init = function(){
   //console.log("here");
   // this.handleUsernameClick();
   // this.handleSubmit();
+  this.lastTime;
   this.fetch();
-  // this.attachEventHandlers();
+  window.setInterval(this.fetch,2000);
+  this.attachEventHandlers();
 };
 
 app.server = "http://parse.sfm6.hackreactor.com/chatterbox/classes/messages";
@@ -32,17 +34,63 @@ app.send = function(message) {
 };
 
 app.fetch = function() {
+
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
     url: app.server,
     type: 'GET',
-    // data: JSON.stringify(message),
+    data: {limit: 10, order: '-createdAt'},
     contentType: 'application/json',
     success: function (data) {
       console.log('chatterbox: Message recieved');
-      console.log(data);
-      app.renderAll(data.results);
+      // results is results.data
+      var results = data.results;
+      // if last time is not defined then set it to 0
+      if (app.lastTime === undefined) {
+        app.renderAll(results);
+        app.lastTime = results[results.length -1].createdAt;
+      } else {
+        // iterate through results
+        for (var i = 0; i < results.length; i++) {
+          console.log(results[i].createdAt);
+          if (results[i].createdAt > app.lastTime) {
+            console.log('here');
+            app.renderMessage(results[i]);
+            app.lastTime = results[i].createdAt;
+          }
+          else break;
+        }
+      }
+          // if the createdAt of the last result is greater than last time
+            // last time will become createdAt of the last result
+            // render the last result
+            // break
 
+      // console.log(data);
+      // //if lastTime === undefined;
+      // var results = data.results;
+      // if (app.lastTime === undefined) {
+      //   app.lastTime = results[results.length-1].createdAt
+      //   app.renderAll(results)
+      // } else {
+      //
+      //   //iterate through results
+      //   for(var i = 0; i < results.length; i++) {
+      //     console.log(i);
+      //     if (app.lastTime >= results[i].createdAt) {
+      //
+      //       console.log('break');
+      //       console.log('saved lastTime ', app.lastTime, ' stopping at ',  results[i].createdAt);
+      //
+      //       break;
+      //     }
+      //   }
+      //
+      //   var short = results.slice(i);
+      //   console.log(short);
+      //   app.lastTime = short[short.length -1].createdAt
+      //   app.renderAll(short);
+      // }
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -57,23 +105,27 @@ app.clearMessages = function() {
 };
 
 app.renderMessage = function(message) {
+  //app.lastTime = message.createdAt;
   var user = $("<p class='username'></p>");
   var text = $("<p class='text'></p>");
   var roomname = $("<p class='user'></p>");
+  var time = $("<p class ='time'></p>")
   var messageDiv = $("<div class='chat'></div>");
-  messageDiv.append(user, text, roomname);
+
+  messageDiv.append(user, text, roomname, time);
   $('#chats').append(messageDiv);
   //$('.user').textContent = message.username;
   $(user).text(message.username);
   $(text).text(message.text);
   $(roomname).text(message.roomname);
+  $(time).text(message.createdAt);
   //element.textContent = "<%=untrustedData%>";
 
 };
 
 app.renderAll = function(array) {
   //console.log(array.results);
-  for (var i = 0; i < array.length; i++) {
+  for (var i = array.length -1 ; i >= 0 ; i--) {
     // console.log(array[i]);
     this.renderMessage(array[i]);
   }
@@ -88,21 +140,27 @@ app.handleUsernameClick = function() {
 
 };
 
-// app.handleSubmit = function() {
-//   var value = $('#messageinput').val();
-//   console.log(typeof value);
-//   app.send(value);
-//
-// };
-//
-// app.attachEventHandlers = function() {
-//   // document.getElementById('sendbutton').addEventListener('click', this.handleSubmit.bind(this));
-//   $(function() {
-//     $("#sendbutton").click(function( ) {
-//       app.handleSubmit();
-//     });
-//   });
+app.handleSubmit = function() {
+  var value = $('#messageinput').val();
+  var messageObj = {
+    roomname: '',
+    username: window.location.search.slice(10),
+    text: value
+  };
+  console.log(typeof value);
+  app.send(messageObj);
 
-// }
+};
+
+app.attachEventHandlers = function() {
+  // document.getElementById('sendbutton').addEventListener('click', this.handleSubmit.bind(this));
+  $(function() {
+    $("#sendbutton").click(function() {
+      event.preventDefault();
+      app.handleSubmit();
+    });
+  });
+
+}
 
 app.init();
