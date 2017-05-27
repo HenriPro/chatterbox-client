@@ -6,6 +6,7 @@ app.init = function(){
   // this.handleUsernameClick();
   // this.handleSubmit();
   this.lastTime;
+  this.friendList = {};
   this.fetch();
   window.setInterval(this.fetch,2000);
   this.attachEventHandlers();
@@ -106,11 +107,18 @@ app.clearMessages = function() {
 
 app.renderMessage = function(message) {
   //app.lastTime = message.createdAt;
+  // check if this person is in our friendlist
+    // if they are then add friend class to chat
   var user = $("<p class='username'></p>");
   var text = $("<p class='text'></p>");
   var roomname = $("<p class='user'></p>");
   var time = $("<p class ='time'></p>")
-  var messageDiv = $("<div class='chat'></div>");
+
+  if (app.friendList[message.username] === true) {
+    var messageDiv = $("<div class='chat friend'></div>");
+  } else {
+    var messageDiv = $("<div class='chat'></div>");
+  }
 
   messageDiv.append(user, text, roomname, time);
   $('#chats').append(messageDiv);
@@ -118,10 +126,22 @@ app.renderMessage = function(message) {
   $(user).text(message.username);
   $(text).text(message.text);
   $(roomname).text(message.roomname);
-  $(time).text(message.createdAt);
-  //element.textContent = "<%=untrustedData%>";
+  $(time).text(message.createdAt)
 
+  $(user).click(function() {
+    event.preventDefault();
+    app.friendList[$(user).text()] = true;
+    $(`p:contains(${message.username})`).parent().addClass('friend');
+  //  alert('work');
+  });
 };
+
+// app.injectFriend = function(username) {
+//
+// }
+
+
+
 
 app.renderAll = function(array) {
   //console.log(array.results);
