@@ -7,6 +7,7 @@ app.init = function(){
   // this.handleSubmit();
   this.lastTime;
   this.friendList = {};
+  this.roomList = {};
   this.fetch();
   window.setInterval(this.fetch,2000);
   this.attachEventHandlers();
@@ -111,7 +112,7 @@ app.renderMessage = function(message) {
     // if they are then add friend class to chat
   var user = $("<p class='username'></p>");
   var text = $("<p class='text'></p>");
-  var roomname = $("<p class='user'></p>");
+  var roomname = $("<p class='roomname'></p>");
   var time = $("<p class ='time'></p>")
 
   if (app.friendList[message.username] === true) {
@@ -133,14 +134,25 @@ app.renderMessage = function(message) {
     app.friendList[$(user).text()] = true;
     $(`p:contains(${message.username})`).parent().addClass('friend');
   //  alert('work');
+
+
   });
+
+
+  app.roomFilter(message.roomname);
+  app.roomList[message.roomname] = true;
+
 };
 
 // app.injectFriend = function(username) {
 //
 // }
 
-
+app.roomFilter = function(roomName) {
+  if(!app.roomList[roomName]) {
+    $('#rooms').append(`<option>${roomName}</option>`);
+  }
+};
 
 
 app.renderAll = function(array) {
